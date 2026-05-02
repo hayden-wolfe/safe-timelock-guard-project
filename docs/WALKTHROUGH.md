@@ -34,13 +34,12 @@
 - [x] Read existing example guards (`OnlyOwnersGuard`, `DelegateCallTransactionGuard`, `BaseGuard`).
 - [x] `npm install` and run a single guard test as a smoke test.
 - [x] Draft `DESIGN.md`.
-- [ ] **Create your own GitHub repo** (e.g. `hwolfe1209/timelock-guard`) for the project deliverables. This is the URL that goes at the top of your final report.
-- [ ] **Sign the Safe CLA** at https://safe.global/cla — required before any PR is merged. Do this now so it's not a Week 3 blocker.
-- [ ] **Fork** `safe-fndn/safe-smart-account` on GitHub. Your contract changes will live on a branch in this fork.
+- [x] **Create GitHub repo** (`hayden-wolfe/timelock-guard`) for the project deliverables. This is the URL that goes at the top of the final report.
+- [x] **Fork** `safe-fndn/safe-smart-account` on GitHub. Your contract changes will live on a branch in this fork.
 
 ### Day 2–3 — Engage upstream
 
-- [ ] Post a brief comment on [Issue #1065](https://github.com/safe-fndn/safe-smart-account/issues/1065) — something like:
+- [x] Post a brief comment on [Issue #1065](https://github.com/safe-fndn/safe-smart-account/issues/1065) — something like:
   > "Hi — I'm planning to take a stab at this as part of a university course project. My current sketch: a `BaseTransactionGuard` with a separate `scheduleTransaction(...)` entry-point (since reverting in `checkTransaction` would roll back any state the guard wrote). Would maintainers be open to a PR along these lines? Happy to align on API."
 - This earns "Evidence of real interaction with the codebase" (rubric 2.3, up to 5 pts) even if maintainers don't respond before the deadline.
 
