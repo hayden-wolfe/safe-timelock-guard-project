@@ -1,8 +1,12 @@
 # TimelockGuard — Design Document
 
 **Project:** Timelock Guard: A Transaction Delay for Safe Smart Accounts
-**Target repo:** [safe-fndn/safe-smart-account](https://github.com/safe-fndn/safe-smart-account)
+
+**Target repo:** [safe-fndn/safe-modules](https://github.com/safe-fndn/safe-modules) — contributed as `modules/timelock-guard/`
+*(Originally proposed for [safe-fndn/safe-smart-account](https://github.com/safe-fndn/safe-smart-account); maintainer nlordell redirected to safe-modules in [#1065](https://github.com/safe-fndn/safe-smart-account/issues/1065).)*
+
 **Issue:** [#1065](https://github.com/safe-fndn/safe-smart-account/issues/1065)
+
 **Author:** Hayden Wolfe
 
 ---

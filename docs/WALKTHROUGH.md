@@ -155,11 +155,11 @@ Record with QuickTime or Loom. Upload to YouTube (unlisted is fine) and embed in
 
 ### Day 20 — Draft PR
 
-- [ ] On your fork branch, push the final commit.
-- [ ] Open a **draft PR** against `safe-fndn/safe-smart-account:main` titled something like:
-  > `feat(guards): add TimelockGuard example contract (closes #1065)`
-- [ ] PR body: short summary, design highlights, test results, gas numbers, and a link to your demo video.
-- [ ] Confirm CLA box in the PR template.
+- [ ] On your `safe-modules` fork branch, push the final commit.
+- [ ] Open a **draft PR** against `safe-fndn/safe-modules:main` titled something like:
+  > `feat(modules): add TimelockGuard — configurable transaction delay for Safe Smart Accounts`
+- [ ] PR body: short summary, design highlights, comparison with the Optimism guard, test results, gas numbers, and a link to your demo video.
+- [ ] Check the CLA box in the PR template (the CLA Assistant bot will prompt you to sign via GitHub on PR open — takes ~15 seconds).
 - [ ] Add the PR URL to your project README and the report.
 
 ### Day 21 — Buffer / polish
@@ -173,20 +173,24 @@ Record with QuickTime or Loom. Upload to YouTube (unlisted is fine) and embed in
 ## Quick reference: commands you'll use repeatedly
 
 ```bash
-# Inside safe-smart-account/
-npm run build                                  # compile
-npm run test:hardhat                           # fast test loop (skips L1/L2/secp256r1 variants)
-npx hardhat test test/guards/TimelockGuard.spec.ts   # just your tests
-npm run coverage                               # line coverage
-npm run lint:sol && npm run fmt:sol            # before committing
-npm run benchmark                              # gas numbers
+# From repo root (safe-modules/) — workspace-level
+pnpm install                      # install all workspace deps
+
+# Inside safe-modules/modules/timelock-guard/
+pnpm build                        # compile
+pnpm test                         # run tests
+pnpm coverage                     # line coverage
+pnpm lint                         # solhint + eslint
+pnpm fmt                          # prettier (run before committing)
 ```
 
 ## Files & links you'll come back to
 
-- Issue: https://github.com/safe-fndn/safe-smart-account/issues/1065
-- Safe CLA: https://safe.global/cla
-- `Safe.sol::execTransaction`: [`safe-smart-account/contracts/Safe.sol:140`](../../safe-smart-account/contracts/Safe.sol#L140)
+- Issue (closed, referenced for context): https://github.com/safe-fndn/safe-smart-account/issues/1065
+- PR target: https://github.com/safe-fndn/safe-modules
+- Your fork branch: https://github.com/hayden-wolfe/safe-modules/tree/feat/timelock-guard
+- `Safe.sol::execTransaction` (reference): [`safe-smart-account/contracts/Safe.sol:140`](../../safe-smart-account/contracts/Safe.sol#L140)
 - `ITransactionGuard` definition: [`safe-smart-account/contracts/base/GuardManager.sol:15`](../../safe-smart-account/contracts/base/GuardManager.sol#L15)
-- Test template: [`safe-smart-account/test/guards/DelegateCallTransactionGuard.spec.ts`](../../safe-smart-account/test/guards/DelegateCallTransactionGuard.spec.ts)
+- Allowances module (structure template): [`safe-modules/modules/allowances/`](../../safe-modules/modules/allowances/)
+- Optimism guard (comparison baseline): https://github.com/ethereum-optimism/optimism/blob/main/packages/contracts-bedrock/src/safe/TimelockGuard.sol
 - Reference design: [OpenZeppelin TimelockController](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol)
