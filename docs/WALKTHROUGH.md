@@ -43,19 +43,26 @@
   > "Hi — I'm planning to take a stab at this as part of a university course project. My current sketch: a `BaseTransactionGuard` with a separate `scheduleTransaction(...)` entry-point (since reverting in `checkTransaction` would roll back any state the guard wrote). Would maintainers be open to a PR along these lines? Happy to align on API."
 - This earns "Evidence of real interaction with the codebase" (rubric 2.3, up to 5 pts) even if maintainers don't respond before the deadline.
 
-### Day 4–5 — Lock in the design
+### Day 4–5 — Lock in the design ✅
 
-- [ ] Read the current `DESIGN.md`. Push back on anything you disagree with — it's a starting point, not a contract.
-- [ ] Decide:
-  - `MIN_DELAY` and `MAX_DELAY` values (suggest: `MIN_DELAY = 30 seconds` for tests/Sepolia, `MAX_DELAY = 30 days`).
-  - Whether to also support `IModuleGuard` (recommend: no, scope creep).
-  - Whether `cancel` allows cancellers to cancel anything or only their own scheduled txs (recommend: anything — they're trusted).
-- [ ] Sketch the `TimelockGuard.sol` skeleton (function signatures + NatSpec, no bodies). Commit it to your fork branch.
+- [x] Read the current `DESIGN.md`.
+- [x] Finalized design decisions (see `DESIGN.md §5`):
+  - `MIN_DELAY = 30s` for Sepolia/tests, `MAX_DELAY = 30 days` — documented in §5.1
+  - No `IModuleGuard` support — out of scope for v1 (§5.2)
+  - Any authorized canceller may cancel any scheduled tx (§5.3)
+  - Hash-only storage (`uint256 readyAt`), not full tx data (§5.4)
+  - On-chain canceller ACL, not signature-based cancellation (§5.5)
+  - `setUp` reverts if already configured; use `updateDelay` to change (§5.6)
+  - Schedule entry preserved on failed execution (§5.7)
+- [x] Added Optimism TimelockGuard comparison (see `DESIGN.md §6`)
+- [x] Contract skeleton committed to `hayden-wolfe/safe-modules` feat/timelock-guard
 
-### Day 6–7 — Buffer + first benchmark of the existing repo
+### Day 6–7 — Buffer + first benchmark ✅
 
-- [ ] Run `npm run benchmark` once on a clean checkout to know the baseline numbers for `execTransaction` with no guard. Save the output. You'll need this for the "before/after" comparison in the report.
-- [ ] Create your project repo's `README.md` with the goal, links to upstream issue, and a "what this is" section.
+- [x] Ran `npm run benchmark` on safe-smart-account v1.5.0. Saved to `report/gas-baseline.md`.
+  - Key baseline: 1-owner Safe ETH transfer = **58,142 gas** (no guard); with guard = **63,975 gas** (+5,833 overhead)
+  - Estimated TimelockGuard overhead: **~8,000–10,000 gas** per `execTransaction`; `scheduleTransaction` ~60,000–80,000 gas
+- [x] Project README already complete from Day 1.
 
 **Week 1 commit goal:** at least one commit per day in your project repo, even if small.
 
