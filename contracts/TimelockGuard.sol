@@ -1,3 +1,9 @@
+// DESIGN REFERENCE ONLY — NOT MEANT TO COMPILE.
+// The real implementation is at:
+//   safe-modules/modules/timelock-guard/contracts/TimelockGuard.sol
+// Imports here use local relative paths from the original safe-smart-account
+// target; they have not been updated after the pivot to safe-modules.
+
 // SPDX-License-Identifier: LGPL-3.0-only
 /* solhint-disable one-contract-per-file */
 pragma solidity >=0.7.0 <0.9.0;
