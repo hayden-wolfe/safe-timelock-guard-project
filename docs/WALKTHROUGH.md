@@ -98,10 +98,10 @@ Run `npm run lint:sol` and `npm run fmt:sol` before each commit — the upstream
 
 ### Day 13–14 — Hardening
 
-- [ ] Run the full repo test suite (`npm run test`). Your change must not break anything else.
-- [ ] Fuzz a few invariants if you have time (e.g. via Foundry — optional, but a strong differentiator for the rubric's "depth and originality" criterion).
-- [ ] Add NatSpec to every external function.
-- [ ] Update `safe-smart-account/contracts/examples/README.md` to mention the new guard.
+- [x] Run the full repo test suite. No workspace-level `test` script exists; each module runs independently. Results: `timelock-guard` 45/45, `allowances` 34/34. `recovery` has no test script (pure TS library). `4337` has a pre-existing broken local build (`safe-4337-local-bundler` missing `dist/`) unrelated to this change.
+- [ ] Fuzz a few invariants (optional — skipped; Foundry not set up in this workspace).
+- [x] NatSpec added to every external function. Configuration and lifecycle functions have full `@notice`/`@dev`/`@param`/`@return`. Guard hooks (`checkTransaction`, `checkAfterExecution`) use `@dev` only — appropriate since they are protocol-internal hooks called by the Safe, not user entry points. `fallback()` has an inline comment but no formal NatSpec block.
+- [x] Updated `safe-modules/README.md` to list Timelock Guard in the Modules section. Also added **Canceller management** and **Security considerations** sections to `modules/timelock-guard/README.md`.
 
 **Week 2 commit goal:** 3–5 commits per day during implementation. Small commits per logical step (add storage, add setUp, add tests for setUp, etc.) demonstrate progressive work.
 
