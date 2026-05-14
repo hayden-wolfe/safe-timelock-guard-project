@@ -35,7 +35,7 @@ All links open on Sepolia Etherscan. Deployment performed by
 
 | Field | Value |
 |---|---|
-| Address | _TBD_ |
+| Address | `0x4d5C46555a4DB2F47246736b6Ef8B5C362fee738` |
 | Owner | `0xF63b1D22cEAD818e3928e6b8874b95B54E46fb5E` (1-of-1) |
 | Configured delay | 60 s |
 
@@ -43,12 +43,12 @@ All links open on Sepolia Etherscan. Deployment performed by
 
 | Step | Method | Tx hash | Etherscan |
 |---|---|---|---|
-| 1 | `SafeProxyFactory.createProxyWithNonce` | _TBD_ | _TBD_ |
-| 2 | ETH transfer (fund Safe) | _TBD_ | _TBD_ |
-| 3 | `Safe.execTransaction` → `TimelockGuard.setUp(60)` | _TBD_ | _TBD_ |
-| 4 | `Safe.execTransaction` → `Safe.setGuard(guard)` | _TBD_ | _TBD_ |
-| 5 | `TimelockGuard.scheduleTransaction` | _TBD_ | _TBD_ |
-| 6 | `Safe.execTransaction` (delayed ETH transfer) | _TBD_ | _TBD_ |
+| 1 | `SafeProxyFactory.createProxyWithNonce` | 0xaa4de40e9daf5962df8f81167782f1569484048a636f1d85aeddc0269c23559b | https://sepolia.etherscan.io/tx/0xaa4de40e9daf5962df8f81167782f1569484048a636f1d85aeddc0269c23559b |
+| 2 | ETH transfer (fund Safe) | 0x7d1c508add35b149f8d02465ac017060892df9e07992ccf3f8278b1b1cec5ad4 | https://sepolia.etherscan.io/tx/0x7d1c508add35b149f8d02465ac017060892df9e07992ccf3f8278b1b1cec5ad4 |
+| 3 | `Safe.execTransaction` → `TimelockGuard.setUp(60)` | 0xd28dc657c7fd82f0c659e7fa4db048f6345fe9bb7df85def2a4b06ec072750b2 | https://sepolia.etherscan.io/tx/0xd28dc657c7fd82f0c659e7fa4db048f6345fe9bb7df85def2a4b06ec072750b2 |
+| 4 | `Safe.execTransaction` → `Safe.setGuard(guard)` | 0x13a4decafa51b0213b22c19101dceda0d29b3c2d1292956cf3b93c825929172f | https://sepolia.etherscan.io/tx/0x13a4decafa51b0213b22c19101dceda0d29b3c2d1292956cf3b93c825929172f |
+| 5 | `TimelockGuard.scheduleTransaction` | 0x98c15aeb17851e77de414ec5e5d7f0e2752606b3bf9db619fd1eacb97cf3195b | https://sepolia.etherscan.io/tx/0x98c15aeb17851e77de414ec5e5d7f0e2752606b3bf9db619fd1eacb97cf3195b |
+| 6 | `Safe.execTransaction` (delayed ETH transfer) | 0x3010cf078a90efeaa7230d97bed22f94c8b2e7f5a7d47f411338427b57e14cb9 | https://sepolia.etherscan.io/tx/0x3010cf078a90efeaa7230d97bed22f94c8b2e7f5a7d47f411338427b57e14cb9 |
 
 ---
 
