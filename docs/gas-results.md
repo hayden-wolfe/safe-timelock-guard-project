@@ -1,67 +1,110 @@
 # Gas Results — TimelockGuard
 
-Captured during the Week 2 test run (`pnpm test` inside
-`safe-modules/modules/timelock-guard/`).
-Hardhat automatically prints a gas table at the end of every test run because
-`hardhat.config.ts` contains `gasReporter: { enabled: true }`.
-To reproduce: run `pnpm test` in that directory and read the bottom table.
+Two measurement sources are combined here:
 
-Compiler: solc 0.8.27, optimizer enabled, 200 runs, viaIR.
-Network: Hardhat local (no gas price).
+1. **Hardhat local** — `pnpm hardhat run scripts/benchmark.ts` (non-L2 Safe, 1-of-1 owner).
+   Apples-to-apples overhead comparison against the Week 1 baseline.
+2. **Sepolia testnet** — actual receipts from the lifecycle demo
+   (`pnpm hardhat run scripts/demo-sepolia.ts --network sepolia`).
+   Uses Safe L2 v1.4.1 which emits additional indexing events per `execTransaction`.
+
+Compiler: solc 0.8.27, optimizer 200 runs, viaIR.
 
 ---
 
-## Method costs
+## Deployment
 
-| Contract       | Method                | Min gas | Max gas | Avg gas |
-|----------------|-----------------------|---------|---------|---------|
-| TimelockGuard  | `scheduleTransaction` | 76,674  | 78,207  | 76,865  |
-| TimelockGuard  | `cancel`              | 27,014  | 27,026  | 27,023  |
-| TimelockGuard  | `setUp`               | 45,355  | 45,367  | 45,358  |
+| Contract      | Gas (Hardhat) | Gas (Sepolia, CREATE2) |
+|---------------|---------------|------------------------|
+| TimelockGuard | 807,546       | 809,198                |
 
-`updateDelay` and `setCanceller` were not called enough times to appear in the
-reporter table, but each performs a single SSTORE (warm slot after setUp) and
-emits one event — expected cost: ~25,000–30,000 gas.
+The small Sepolia premium reflects a cold-state deployment on a live network.
+Deployment uses the Safe Singleton Factory (CREATE2) for a deterministic address.
 
-## Deployment cost
+---
 
-| Contract      | Gas     |
-|---------------|---------|
-| TimelockGuard | 807,545 |
+## User-facing operations
 
-## execTransaction overhead (from Week 1 baseline)
+### Hardhat local (non-L2 Safe singleton, 1-of-1 owner)
 
-These numbers come from the existing Safe benchmark (`npm run benchmark` in
-`safe-smart-account/`, recorded in `gas-baseline.md`).
+Run with `pnpm hardhat run scripts/benchmark.ts`.
 
-| Configuration                          | execTransaction gas | Guard overhead |
-|----------------------------------------|---------------------|----------------|
-| 1-owner Safe, ETH transfer, no guard   | 58,142              | —              |
-| 1-owner Safe, ETH transfer, with guard | 63,975              | +5,833         |
+| Operation                                       | Gas used |
+|-------------------------------------------------|----------|
+| `setUp(delay)` via `Safe.execTransaction`       | 93,109   |
+| `setGuard(guard)` via `Safe.execTransaction`    | 74,669   |
+| `scheduleTransaction` (ETH transfer, 1-of-1)   | 76,734   |
+| `execTransaction` — no guard (ETH transfer)    | 55,766   |
+| `execTransaction` — with TimelockGuard         | 69,733   |
+| **TimelockGuard overhead per execTransaction** | **13,967** |
 
-The existing example guard (used in the baseline benchmark) adds ~5,833 gas per
-execTransaction. The TimelockGuard does more work in `checkTransaction`
-(two external calls to `ISafe.nonce()` and `ISafe.getTransactionHash()`, plus
-one cold SLOAD and a timestamp compare) and more in `checkAfterExecution`
-(conditional SSTORE delete + event). Estimated TimelockGuard overhead:
+Gas reporter values (aggregated over all 45 tests, `pnpm test`):
 
-| Phase                     | Est. gas |
-|---------------------------|----------|
-| `checkTransaction`        | ~5,000   |
-| `checkAfterExecution`     | ~3,000   |
-| **Total per execTransaction** | **~8,000** |
+| Method               | Min gas | Max gas | Avg gas |
+|----------------------|---------|---------|---------|
+| `scheduleTransaction` | 76,674  | 78,207  | 76,865  |
+| `cancel`             | 27,014  | 27,026  | 27,023  |
+| `setUp`              | 45,355  | 45,367  | 45,358  |
 
-Exact numbers will be measured in the Week 3 Sepolia benchmark
-(`benchmark/Safe.TimelockGuard.spec.ts`).
+### Sepolia testnet (Safe L2 v1.4.1, 1-of-1 owner)
+
+Receipts fetched from the lifecycle demo run. Safe L2 emits a
+`SafeMultiSigTransaction` event on every `execTransaction`, adding ~8–9 k gas
+relative to the non-L2 local baseline.
+
+| Step | Operation | Gas used |
+|------|-----------|----------|
+| 3 | `setUp(60)` via `Safe.execTransaction` | 101,697 |
+| 4 | `setGuard(guard)` via `Safe.execTransaction` | 83,280 |
+| 5 | `scheduleTransaction` (ETH transfer) | 70,537 |
+| 6 | `execTransaction` (timelocked ETH, with guard) | 78,348 |
+
+---
+
+## execTransaction overhead analysis
+
+| Metric | Gas |
+|--------|-----|
+| Baseline: 1-owner Safe, ETH transfer, no guard (Hardhat) | 55,766 |
+| Baseline: 1-owner Safe, ETH transfer, generic guard (Week 1 benchmark) | 63,975 |
+| TimelockGuard: 1-owner Safe, ETH transfer (Hardhat) | 69,733 |
+| **TimelockGuard overhead vs no guard** | **+13,967** |
+| **TimelockGuard overhead vs generic example guard** | **+5,758** |
+
+The guard's overhead breaks down as:
+
+| Phase | Operation | Est. gas |
+|-------|-----------|----------|
+| `checkTransaction` | Cold SLOAD (`_schedules[safe][txHash]`) + external call to `getTransactionHash` | ~8,000 |
+| `checkAfterExecution` | SSTORE delete (refund applies) + `TransactionExecuted` event | ~6,000 |
+| **Total** | | **~14,000** |
+
+This aligns with the measured 13,967 gas. The overhead is roughly 2.4× the
+~5,833 gas cost of a simple example guard (which does only comparison logic with
+no storage writes).
+
+---
+
+## Context: comparison with Week 1 baseline
+
+The Week 1 upstream benchmark (`npm run benchmark` in `safe-smart-account/`)
+measured a 1-owner Safe ETH transfer at **58,142 gas** (no guard). The small
+difference vs this benchmark's 55,766 gas is because the upstream benchmark
+deploys the Safe with a `CompatibilityFallbackHandler`, while the local
+benchmark uses no fallback handler. Both are valid 1-of-1 configurations.
 
 ---
 
 ## Key takeaways for the report
 
-- `scheduleTransaction` costs ~77k gas — roughly 1.3× a simple ETH transfer
-  from an EOA. This is a one-time cost per transaction.
-- `execTransaction` overhead with TimelockGuard installed is estimated at
-  ~8k gas vs the baseline of no guard. This aligns with the design goal of
-  keeping the guard cheap to operate once a tx is scheduled.
-- The guard contract itself deploys for ~808k gas (~0.8% of the Hardhat
-  block limit), which is reasonable for a multi-Safe singleton.
+- **`scheduleTransaction`**: ~77 k gas — a one-time cost per guarded transaction.
+  This is ~1.4× a basic EOA ETH transfer (21 k gas), roughly equivalent to a
+  simple ERC-20 transfer.
+- **`execTransaction` overhead**: ~14 k gas with TimelockGuard vs no guard.
+  This is the permanent per-execution cost once a Safe adopts the guard.
+- **`cancel`**: ~27 k gas — cheap enough to be exercised freely by monitoring
+  infrastructure if a suspicious transaction is scheduled.
+- **Deployment**: ~808 k gas (one-time, shared across all Safes as a singleton).
+- The overhead is dominated by the cold SLOAD in `checkTransaction` and the
+  SSTORE delete in `checkAfterExecution`. Both are unavoidable for any
+  guard that uses on-chain storage to enforce a delay.
