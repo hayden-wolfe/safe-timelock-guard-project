@@ -34,13 +34,13 @@ The actual contract development happens on a fork of `safe-fndn/safe-modules`; t
 ## Status
 
 - [x] Week 1: design + dev environment
-- [ ] Week 2: implementation + tests
-- [ ] Week 3: Sepolia deploy, gas benchmarks, demo video, draft PR
+- [x] Week 2: implementation + tests
+- [x] Week 3: Sepolia deploy, gas benchmarks, demo video, draft PR
 
 ## Links
 
 - Upstream issue: https://github.com/safe-fndn/safe-smart-account/issues/1065
 - PR target repo: https://github.com/safe-fndn/safe-modules
 - Fork branch (contract lives here): https://github.com/hayden-wolfe/safe-modules/tree/feat/timelock-guard
-- Draft PR: _to be added (Week 3)_
-- Demo video: _to be added (Week 3)_
+- Draft PR: https://github.com/safe-fndn/safe-modules/pull/534
+- Demo video: https://youtu.be/wSn_PIvW09s
